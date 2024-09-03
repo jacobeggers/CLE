@@ -18,12 +18,14 @@ public class Program
         string beginDisplayString = $"=-=-=-=-=-(Saved: {saved} | File Type: .txt | File Name: test | Size: {0}kb)-=-=-=-=-=";
         string endDisplayString = "";
 
-        for (int i = 0; i < beginDisplayString.Length / 2; i++)
+        for (int i = 0; i < beginDisplayString.Length; i++)
         {
-            endDisplayString += "-=";
+            endDisplayString += '=';
         }
         beginDisplayString += '\n';
         endDisplayString += '\n';
+
+        int indentLength = 0;
 
         int cursorX = 0;
         int cursorY = 0;
@@ -49,7 +51,7 @@ public class Program
 
         while (true)
         {
-            isFirstIteration = resetScreen(isFirstIteration, content, consoleStartingY, consoleLength, beginDisplayString, endDisplayString);
+            isFirstIteration = resetScreen(isFirstIteration, content, consoleStartingY, consoleLength, indentLength, beginDisplayString, endDisplayString);
 
             if (key != ConsoleKey.NoName )
             {
@@ -133,10 +135,33 @@ public class Program
             {
                 consoleLength = finalConsoleLength;
             }
-            
+
+            int numberIndent = 0;
+            int endLine = (content.Length < consoleStartingY + consoleLength ? content.Length : consoleStartingY + consoleLength) - 1;
+            while (endLine > 0)
+            {
+                endLine /= 10;
+                numberIndent++;
+            }
+            indentLength = numberIndent + 5;
+
             for (int i = consoleStartingY; i < (content.Length < consoleStartingY + consoleLength ? content.Length : consoleStartingY + consoleLength); i++)
             {
-                finalString += $"{i, 3} : ";
+                finalString += ' ';
+                
+                int numberLength = 0;
+                int index = i;
+                while (index > 0)
+                {
+                    index /= 10;
+                    numberLength++;
+                }
+                for (int j = 0; j < (i != 0 ? numberIndent - numberLength : numberIndent - 1); j++)
+                {
+                    finalString += ' ';
+                }
+                
+                finalString += $"{i} : ";
                 for (int j = 0; j < content[i].Length; j++)
                 {
                     if (j == cursorX && i == cursorY)
@@ -147,7 +172,7 @@ public class Program
                     // {
                     //     finalString += '·';
                     // }
-                    else
+                    else if (content[i][j] != '\0')
                     {
                         finalString += content[i][j];
                     }
@@ -257,17 +282,18 @@ public class Program
         return newContent;
     }
 
-    public static bool resetScreen(bool isFirstIteration, char[][] content, int y, int length, string beginDisplayString, string endDisplayString)
+    public static bool resetScreen(bool isFirstIteration, char[][] content, int y, int length, int indentLength, string beginDisplayString, string endDisplayString)
     {
         if (!isFirstIteration)
         {
 
-            Console.SetCursorPosition(0, Console.CursorTop - 1);
-            for (int i = y; i < (content.Length < y + length ? content.Length : y + length); i++)
-            {
-                Console.SetCursorPosition(0, Console.CursorTop - 1);
-            }
-            Console.SetCursorPosition(0, Console.CursorTop - 1);
+            // Console.SetCursorPosition(0, Console.CursorTop - 1);
+            // for (int i = y; i < (content.Length < y + length ? content.Length : y + length); i++)
+            // {
+            //     Console.SetCursorPosition(0, Console.CursorTop - 1);
+            // }
+            // Console.SetCursorPosition(0, Console.CursorTop - 1);
+            Console.SetCursorPosition(0, Console.CursorTop - (content.Length < y + length ? content.Length : length) - 2);
 
             string resetString = "";
 
@@ -280,7 +306,7 @@ public class Program
 
             for (int i = y; i < (content.Length < y + length ? content.Length : y + length); i++)
             {
-                for (int j = 0; j < content[i].Length + 6; j++)
+                for (int j = 0; j < content[i].Length + indentLength; j++)
                 {
                     resetString += " ";
                 }
