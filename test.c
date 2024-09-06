@@ -46,7 +46,7 @@ char convert_num_to_char(int num) {
 }
 
 char* insert_char(char* str, char c, int index) {
-  int length = strlen(str) + 1 + 1;
+  int length = strlen(str) + 2;
   char* new_str = malloc(length * sizeof(char));
 
   int j = 0;
@@ -68,14 +68,23 @@ char* insert_char(char* str, char c, int index) {
   return new_str;
 }
 
+char* insert_string(char* str, char* str_to_be_added, char indicator) {
+  
+  for (int i = 0; i < strlen(str); i++) {
+    if (str[i] == indicator) {
+      for (int j = strlen(str_to_be_added) - 1; j >= 0; j--) {
+        str = insert_char(str, str_to_be_added[j], i + 1);
+      }
+    }
+  }
+  return str;
+}
+
 void print_screen(int cols, int rows, char content[rows][cols], int saved) {
 
-  char* final_string = "=-=-=-=-=-(Saved:  | File Name: test.txt | Size: 0kb)-=-=-=-=-=\n";
-  
-  char* saved_display = (saved == 1) ? "TRUE" : "FALSE";
-  for (int i = strlen(saved_display) - 1; i >= 0; i--) {
-    final_string = insert_char(final_string, saved_display[i], 18);
-  }
+  char* final_string = "=-=-=-=-=-(Saved: _ | File Name: text.txt | Size: 0kb)-=-=-=-=-=\n";
+
+  final_string = insert_string(final_string, (saved == 1) ? "TRUE" : "FALSE", '_');
   
   for (int i = 0; i < rows; i++) {
     final_string = insert_char(final_string, ' ', strlen(final_string));
@@ -88,7 +97,7 @@ void print_screen(int cols, int rows, char content[rows][cols], int saved) {
     final_string = insert_char(final_string, '\n', strlen(final_string));
   }
   printf(final_string);
-
+  // free(final_string);
 }
 
 int main() {
@@ -100,7 +109,7 @@ int main() {
     }
   }
 
-  int saved = 1;
+  int saved = 0;
 
   int cursor_x = 0;
   int cursor_y = 0;
